@@ -32,7 +32,7 @@ class Tool(models.Model):
     rating = models.IntegerField(null=True)
 
     def __str__(self):
-        return str(self.owner)+"-----"+str(self.title)
+        return str(self.pk)+"-----"+str(self.owner)+"-----"+str(self.title)
 
 
 class Booking(models.Model):
@@ -52,7 +52,7 @@ class Booking(models.Model):
     booking_id = models.CharField(max_length=20, null=True)
 
     def __str__(self):
-        return str(self.tools)+"-----"+str(self.created_date)
+        return str(self.pk)+"-----"+str(self.tools)+"-----"+str(self.created_date)
 
 
 class Location(models.Model):
@@ -67,7 +67,7 @@ class Location(models.Model):
     city = models.CharField(max_length=20,null=True, choices=cities)
 
     def __str__(self):
-        return str(self.city)
+        return str(self.id)+"-----"+str(self.city)
 
 class Payment(models.Model):
     status = (
@@ -84,7 +84,7 @@ class Payment(models.Model):
     payment_id = models.CharField(max_length=20, null=True)
 
     def __str__(self):
-        return str(self.order_id)
+        return str(self.id)+"-----"+str(self.order_id)
 
 class MultiplePhotos(models.Model):
     tool = models.ForeignKey(Tool(), on_delete=models.CASCADE, null=True)
@@ -101,7 +101,7 @@ class Save_Tools(models.Model):
     tool = models.ForeignKey(Tool(), on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return str(self.customer)
+        return str(self.id)+"-----"+str(self.customer)
 
 class Rating(models.Model):
     customer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
@@ -110,4 +110,4 @@ class Rating(models.Model):
     review = models.CharField(max_length=600,null=True)
 
     def __str__(self):
-        return str(self.rating)
+        return str(self.id)+"-----"+str(self.rating)
