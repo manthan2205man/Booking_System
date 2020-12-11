@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<html>
+<head>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+</head>
+
+
+
+
+<body>
+
+<div class="container"><br>
+    <form method="post">
+    {% csrf_token %}
+  <div class="row">
+      <!--home-->
+
+
+    <div class="col">
+        Select Your City
+        <select class="form-control" name="loation" required>
+             <option value="none">City</option>
+        {% for i in data1 %}
+        <option value="{{ i.id }}">{{ i.city|title }}</option>
+         {% endfor %}
+    </select>
+    </div>
+
+
+      <div class="col">
+          Select your from date
+          <div class="input-group date" data-provide="datepicker">
+    <input type="date" class="form-control" name="from_date" required>
+    <div class="input-group-addon">
+        <span class="glyphicon glyphicon-th"></span>
+    </div>
+        </div>
+      </div>
+
+
+      <div class="col">
+          Select your to date
+          <div class="input-group date" data-provide="datepicker">
+    <input type="date" class="form-control" name="to_date" required>
+    <div class="input-group-addon">
+        <span class="glyphicon glyphicon-th"></span>
+    </div>
+        </div>
+      </div>
+
+
+      <div class="col">
+    Select Your Category
+           <select class="form-control" name="category" required>
+        <option value="none">Category</option>
+        {% for i in cat_data %}
+        <option value="{{ i.category }}">{{ i.category|title }}</option>
+         {% endfor %}
+    </select>
+    </div>
+
+       <div class="col">
+           <br>
+<button type="submit" class="btn btn-primary" id="btn" >Filter</button>
+    </div>
+
+
+
+  </div>
+          </form>
+     </div>
+
+<br>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-6 col-md-offset-5 col-sm-0">
+
+          {% for i in data %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+  <div class="card-header">
+      <a href="{% url 'tools_details' i.id %}"> Title : {{i.title|title}}</a>
+  </div>
+  <div class="card-body">
+      <div class="container-fluid">
+          <div class="row">
+              <div class="col-md-6 col-sd-2">
+           <a href="{% url 'tools_details' i.id %}"> <img src="{{ i.photo.url }}" height="170" width="230"></a>
+                  {% if i.rating %}
+                 <br> <p>  <span class="fa fa-star checked"></span> Rating - {{ i.rating }} </p>
+                  {% endif %}
+              </div>
+                  <div class="col-md-6 col-sd-3">
+     <p class="card-text"> <b>Price  : </b>Rs. {{i.price}} /  night</p>
+    <p class="card-text">  <b>Description     :</b> {{i.description|capfirst}}</p>
+    <p class="card-text">  <b>Address         :</b> {{i.address|capfirst }}</p>
+    <p class="card-text"> <b> City         : </b>{{i.city|title}}</p>
+    <p class="card-text">  <b>Available From         : </b>{{i.to_date}}</p>
+                  </div></div>
+
+      {% if i.owner == request.user %}
+          <div class="row">
+                  <div class="col-md-12 col-sd-3" align="right">
+      <a class="btn btn-primary" href="{% url 'add_multipleimages' i.id %}">Images +</a>
+      <a class="btn btn-primary" href="{% url 'edit_tools' i.id %}">Edit</a>
+     <a class="btn btn-danger" href="{% url 'delete_tools' i.id %}">Delete</a>
+                      </div> </div>
+     {% endif %}
+
+      </div>
+
+
+  </div> </div>
+        </div>
+    </div>   <br>
+            {% endfor %}
+      </div>
+
+    <div class="col-md-6 col-md-offset-5 col-sm-0">
+    <div id="map" style="width:600px; height: 800px;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script>
+
+ {% if loc %}
+        var map_parameters = { center: {lat: {{loc.latitude}}, lng:{{loc.longitude}} }, zoom: 11 };
+    {% else %}
+	var map_parameters = { center: {lat: 21.170240, lng:72.831062}, zoom: 11 };
+    {% endif %}
+
+    var map = new google.maps.Map(document.getElementById('map'), map_parameters);
+
+
+
+   {% for i in data %}
+
+    var icons = {
+          on: {
+          {% if i.category == 'room' %}
+            icon: '{% static 'accounts/assets/img/m.png' %}'
+            {% endif %}
+
+          {% if i.category == 'bike' %}
+            icon: '{% static 'accounts/assets/img/bike.png' %}'
+            {% endif %}
+
+            {% if i.category == 'car' %}
+            icon: '{% static 'accounts/assets/img/car.png' %}'
+            {% endif %}
+          },
+        };
+
+
+        var position1 = { position: {lat: {{ i.latitude }}, lng: {{ i.longitude }} }, map: map, icon:icons.on.icon, label: { color: '#00aaff', fontWeight: 'bold', fontSize: '14px', text: 'Rs . {{i.price }}' } };
+        var marker = new google.maps.Marker(position1)
+
+        var window1 =
+        '<div class="container-fluid">'+
+        '<div class="row">'+
+        '<div class="col-sm-3">'+
+        '<h6><span style="color:blue; font-weight:bold"> Owner: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Ttile: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Price: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Category: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Description: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> City: </span></h6>'+
+        '</div>'+
+
+        '<div class="col-sm-3">'+
+        '<h6><span style="color:black; font-weight:bold"> {{ i.owner.first_name|title }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.title|title }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.price }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.category|title }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.description }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.city|title }} <span style="color:black; font-weight:bold"></h6>'+
+        '</div>'+
+
+        '<div class="col-sm-6">'+
+
+        ' <a href="{% url 'tools_details' i.id %}"><p><img src="{{ i.photo.url }}" height="150" width="280"></a>'+
+         {% if user.is_owner %}
+        '<p align="right"><span style="color:black; font-weight:bold"><a class="btn btn-primary" href="{% url 'edit_tools' i.id %}">Edit</a></span> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp'+
+        '<span style="color:black; font-weight:bold"><a class="btn btn-danger" href="{% url 'delete_tools' i.id %}">Delete</a></span>'+
+        {% endif %}
+
+
+        '</div>'+
+        '</div>'+
+        '</div>';
+
+
+
+        var infowindow = new google.maps.InfoWindow({ content: window1 });
+
+
+    google.maps.event.addListener(marker,'click', (function(marker,window1,infowindow){
+        return function() {
+           infowindow.setContent(window1);
+           infowindow.open(map,marker);
+        };
+    })(marker,window1,infowindow));
+
+
+    {% endfor %}
+
+</script>
+</body>
+</html>
+
+{% endblock %}

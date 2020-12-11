@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+{% load static %}
+<html>
+<head>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+</head>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+
+
+
+<body>
+<br>
+<div class="container">
+  <div class="row justify-content-center">
+      <div class="col-md-6 col-md-offset-5 col-sm-0">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+  <div class="card-header">
+    Title : {{book.tools.title}}
+  </div>
+  <div class="card-body">
+      <div class="container-fluid">
+          <div class="row">
+              <div class="col-md-12 col-sd-6">
+           <img src="{{ book.tools.photo.url }}" height="330" width="480 ">
+              </div></div>
+          <br>
+              <div class="row">
+                  <div class="col-md-12 col-sd-6">
+
+                       <div class="form-group">
+    <label for="inputdefault">Owner Name </label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.tools.owner.first_name }}" readonly="readonly">
+  </div>
+
+
+
+                      <div class="form-group">
+    <label for="inputdefault">Your Name </label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.customer.first_name }}" readonly="readonly">
+  </div>
+
+                      <div class="form-group">
+    <label for="inputdefault">Description</label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.tools.description }}" readonly="readonly">
+  </div>
+                      <div class="form-group">
+    <label for="inputdefault">Address</label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.tools.address }}" readonly="readonly">
+  </div>
+                      <div class="form-group">
+    <label for="inputdefault">City</label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.tools.city }}" readonly="readonly">
+  </div>
+
+                      <div class="form-group">
+    <label for="inputdefault"> Total Days  </label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.booked_days }}" readonly="readonly">
+  </div>
+
+                      <div class="form-group">
+    <label for="inputdefault">Price</label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.amount }}" readonly="readonly">
+  </div>
+
+                      <div class="form-group">
+    <label for="inputdefault">From Date  </label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.from_date }}" readonly="readonly">
+  </div>
+
+                      <div class="form-group">
+    <label for="inputdefault">To Date </label>
+    <input class="form-control" id="inputdefault" type="text" placeholder="{{ book.to_date}}" readonly="readonly">
+  </div>
+                      <div align="center">
+<a class="btn btn-primary" href="{% url 'order' book.id %}" >Book Now</a></div>
+                  </div></div></div>
+
+
+
+  </div> </div>
+        </div>
+    </div>  <br>
+
+      </div>
+
+
+  </div>
+
+</div>
+
+</body>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+
+</body>
+</html>
+
+{% endblock %}

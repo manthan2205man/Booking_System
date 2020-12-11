@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  .right {
+  position: absolute;
+  right: 0px;
+  width: 300px;
+  padding: 10px;
+}
+
+</style>
+<BR>
+<table class="table table-hover">
+  <thead>
+    <tr>
+
+
+      <th scope="col">Owner Name</th>
+      <th scope="col">Cus Name</th>
+      <th scope="col">order date</th>
+        <th scope="col">status</th>
+      <th scope="col">pay</th>
+        <th scope="col">Image</th>
+        <th scope="col">Transaction id</th>
+        <th scope="col">Bank txn id</th>
+        <th scope="col">Transaction date</th>
+        <th scope="col">Order id</th>
+              <th scope="col">Rating</th>
+
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in data %}
+    <tr>
+      <td>{{i.order.tools.owner.first_name}}</td>
+      <td>{{i.order.customer.first_name}}</td>
+      <td>{{i.order_date}}</td>
+        <td>{{i.status}}</td>
+      <td>{{i.amount}}</td>
+        <td><image src="{{i.order.tools.photo.url}}" height="50px" width="100px"> </image></td>
+      <td>{{i.txn_id}}</td>
+      <td>{{i.bank_txn_id}}</td>
+      <td>{{i.txn_date}}</td>
+            <td>{{i.payment_id}}</td>
+                  <td>
+                    {% if i.status == "successful" %}
+          <a class="btn btn-primary" href="{% url 'rating' i.id %}">Rate Us</a>
+              {% endif %}
+
+                  </td>
+
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

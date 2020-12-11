@@ -1,0 +1,10 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__/
+media
+venv
+
+# If you are using PyCharm #
+.idea/

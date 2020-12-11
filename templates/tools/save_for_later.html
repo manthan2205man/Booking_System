@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<html>
+<head>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+</head>
+
+
+
+
+<body>
+
+<br>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-6 col-md-offset-5 col-sm-0">
+
+          {% for i in data %}
+          <a href="{% url 'tools_details' i.id %}">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+  <div class="card-header">
+    Title : {{i.tool.title}}
+  </div>
+  <div class="card-body">
+      <div class="container-fluid">
+          <div class="row">
+              <div class="col-md-6 col-sd-2">
+           <img src="{{ i.tool.photo.url }}" height="170" width="230">
+              </div>
+                  <div class="col-md-6 col-sd-3">
+    <p class="card-text"> Price  : Rs. {{i.tool.price}} /  night</p>
+    <p class="card-text"> Description     : {{i.tool.description}}</p>
+    <p class="card-text"> Address         : {{i.tool.address}}</p>
+    <p class="card-text"> City         : {{i.tool.city}}</p>
+                  </div></div>
+
+          <div class="row">
+                  <div class="col-md-12 col-sd-3" align="right">
+     <a class="btn btn-danger" href="{% url 'delete_save' i.id %}">Remove From Save</a>
+                      </div></div>
+
+      </div>
+
+
+  </div> </div>
+        </div>
+    </div> </a>  <br>
+            {% endfor %}
+      </div>
+
+    <div class="col-md-6 col-md-offset-5 col-sm-0">
+    <div id="map" style="width:600px; height: 600px;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+
+<script>
+
+ {% if loc %}
+        var map_parameters = { center: {lat: {{loc.latitude}}, lng:{{loc.longitude}} }, zoom: 11 };
+    {% else %}
+	var map_parameters = { center: {lat: 21.170240, lng:72.831062}, zoom: 11 };
+    {% endif %}
+
+    var map = new google.maps.Map(document.getElementById('map'), map_parameters);
+
+
+
+   {% for i in data %}
+
+    var icons = {
+          on: {
+          {% if i.tool.category == 'room' %}
+            icon: '{% static 'accounts/assets/img/m.png' %}'
+            {% endif %}
+
+          {% if i.tool.category == 'bike' %}
+            icon: '{% static 'accounts/assets/img/bike.png' %}'
+            {% endif %}
+
+            {% if i.tool.category == 'car' %}
+            icon: '{% static 'accounts/assets/img/car.png' %}'
+            {% endif %}
+          },
+        };
+
+
+        var position1 = { position: {lat: {{ i.tool.latitude }}, lng: {{ i.tool.longitude }} }, map: map, icon:icons.on.icon, label: { color: '#00aaff', fontWeight: 'bold', fontSize: '14px', text: 'Rs . {{i.tool.price }}' } };
+        var marker = new google.maps.Marker(position1)
+
+        var window1 =
+        '<div class="container-fluid">'+
+        '<div class="row">'+
+        '<div class="col-sm-3">'+
+        '<h6><span style="color:blue; font-weight:bold"> Owner: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Ttile: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Price: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Category: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> Description: </span>'+
+        '<p><span style="color:blue; font-weight:bold"> City: </span></h6>'+
+        '</div>'+
+
+        '<div class="col-sm-3">'+
+        '<h6><span style="color:black; font-weight:bold"> {{ i.tool.owner.first_name }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.tool.title }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.tool.price }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.tool.category }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.tool.description }} </span>'+
+        '<p><span style="color:black; font-weight:bold"> {{ i.tool.city }} <span style="color:black; font-weight:bold"></h6>'+
+        '</div>'+
+
+        '<div class="col-sm-6">'+
+
+        ' <a href="{% url 'tools_details' i.id %}"><p><img src="{{ i.tool.photo.url }}" height="150" width="280"></a>'+
+
+
+
+        '</div>'+
+        '</div>'+
+        '</div>';
+
+
+
+        var infowindow = new google.maps.InfoWindow({ content: window1 });
+
+
+    google.maps.event.addListener(marker,'click', (function(marker,window1,infowindow){
+        return function() {
+           infowindow.setContent(window1);
+           infowindow.open(map,marker);
+        };
+    })(marker,window1,infowindow));
+
+
+    {% endfor %}
+
+</script>
+</body>
+</html>
+
+{% endblock %}

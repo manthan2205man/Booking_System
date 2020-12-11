@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  .right {
+  position: absolute;
+  right: 0px;
+  width: 300px;
+  padding: 10px;
+}
+
+</style>
+<BR>
+<table class="table table-hover">
+  <thead>
+    <tr>
+
+      <th scope="col">Owner Name</th>
+      <th scope="col">Cus Name</th>
+      <th scope="col">From date</th>
+        <th scope="col">To date</th>
+      <th scope="col">Address</th>
+        <th scope="col">Image</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Booked Days</th>
+        <th scope="col">payment Status</th>
+
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in data %}
+    <tr>
+
+      <td>{{i.tools.owner.first_name}}</td>
+      <td>{{i.customer.first_name}}</td>
+      <td>{{i.from_date}}</td>
+        <td>{{i.to_date}}</td>
+      <td>{{i.tools.address}}</td>
+        <td><image src="{{i.tools.photo.url}}" height="50px" width="100px"> </image></td>
+      <td>{{i.amount}}</td>
+      <td>{{i.booked_days}}</td>
+      <td>{{i.pay_status}}</td>
+
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
