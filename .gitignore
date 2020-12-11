@@ -5,6 +5,8 @@
 __pycache__/
 media
 venv
-
+airbnb_clone/.env
 # If you are using PyCharm #
 .idea/
+
+
