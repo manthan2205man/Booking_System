@@ -19,7 +19,7 @@ class BookingCreationSerializer(ModelSerializer):
     class Meta:
         model = Booking
         fields = [
-            'customer', 'tool', 'from_date', 'to_date', 'booked_days', 'amount', 'booking_id',
+            'customer', 'tools', 'from_date', 'to_date', 'booked_days', 'amount', 'booking_id',
         ]
 
 class ToolUpdateSerializer(ModelSerializer):

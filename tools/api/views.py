@@ -43,7 +43,7 @@ class BookingCreatView(CreateAPIView):
         data, user = request.data, request.user
         to_date, from_date = datetime.strptime(data['to_date'], "%Y-%m-%d").date(), datetime.strptime(data['from_date'], "%Y-%m-%d").date()
         try:
-            tool = Tool.objects.get(id=data['tool'])
+            tool = Tool.objects.get(id=data['tools'])
         except:
             raise ValidationError({"error":"Tool not Found."})
         if from_date <= tool.to_date:
