@@ -49,7 +49,7 @@
       <td>{{i.txn_date}}</td>
             <td>{{i.payment_id}}</td>
                   <td>
-                    {% if i.status == "successful" %}
+                    {% if i.status == "success" %}
           <a class="btn btn-primary" href="{% url 'rating' i.id %}">Rate Us</a>
               {% endif %}
 

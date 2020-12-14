@@ -11,6 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 import string
 import random
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
+
 # Create your views here.
 
 @login_required(login_url='/accounts/login/')
@@ -151,6 +154,17 @@ def booknow(request,id):
             form.booking_id = bookin_id
             form.save()
             print(form.id)
+
+            message = f'Hello {request.user.first_name}  \n\nYour booking request is confirm. please make payment and confirm your booking \n\n Your Booking Details are' \
+                      f'Booking ID : {form.booking_id}\n' \
+                      f'Booking From Date : {form.from_date} \n' \
+                      f'Booking To Date : {form.to_date} \n' \
+                      f'Booking Days : {form.booked_days} \n' \
+                      f'Amount for payment : {form.amount} \n'
+
+            send_mail('Booking Request', message, settings.EMAIL_HOST_USER, [request.user],
+                      fail_silently=True)
+
             return redirect(booknowdetails,form.id)
 
 @login_required(login_url='/accounts/login/')
@@ -221,20 +235,34 @@ def handlerequest(request):  # paytm will send POST request herre
             obj = Payment.objects.get(payment_id=a)
             print(obj)
 
-            obj.status ='successful'
+            obj.status ='success'
             obj.txn_id = b
             obj.bank_txn_id = c
             obj.txn_date = d
             obj.save()
 
             map = Tool.objects.get(id=obj.order.tools.id)
-            map.status = False
             map.to_date = obj.order.to_date+timedelta(days=1)
             map.save()
 
             book = Booking.objects.get(id=obj.order.id)
-            book.pay_status = 'successful'
+            book.pay_status = 'success'
             book.save()
+
+            message = f'Hello {book.customer.first_name}  \n\nYour booking is Confirm \n\n Your Booking Details are' \
+                      f'Booking ID : {book.booking_id}\n' \
+                      f'Booking From Date : {book.from_date} \n' \
+                      f'Booking To Date : {book.to_date} \n' \
+                      f'Booking Days : {book.booked_days} \n' \
+                      f'Amount for payment : {book.amount} \n' \
+                      f'Payment Status : {obj.status}\n' \
+                      f'Transaction Id : {obj.txn_id} \n' \
+                      f'Bank Transaction Id: {obj.bank_txn_id} \n' \
+                      f'Bank Transaction Date : {obj.txn_date} \n' \
+                      f'Paied Amount : {obj.amount} \n'
+            send_mail('Booking Confirmation', message, settings.EMAIL_HOST_USER, [book.customer],
+                              fail_silently=True)
+
 
         else:
             print('order was not successful because' + response_dict['RESPMSG'])
