@@ -10,3 +10,4 @@ urlpatterns = [
     path('list_tool/', views.ToolListView.as_view(), name='list_tool'),
     path('filter_tool/', views.ToolFilterView.as_view(), name='filter_tool'),
 ]
+# manthan
