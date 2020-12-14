@@ -28,7 +28,7 @@ class ToolCreatView(CreateAPIView):
         serializer = ToolCreationSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.validated_data['owner'] = user
-            serializer.validated_data['to_date'] = (date.today() - timedelta(days=1))
+            serializer.validated_data['to_date'] = (date.today())
             print(serializer.validated_data['to_date'])
             serializer.save()
             return Response(data={"Tool Created Successfully":serializer.data}, status=HTTP_200_OK)
@@ -59,8 +59,6 @@ class BookingCreatView(CreateAPIView):
             serializer.validated_data['amount'] = amount
             serializer.validated_data['booked_days'] = days
             serializer.validated_data['booking_id'] = booking_id
-            tool.to_date = to_date
-            tool.save()
             serializer.save()
             return Response(data={"Booking Created Successfully":serializer.data}, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -92,5 +90,5 @@ class ToolFilterView(APIView):
         location = data['location']
         from_date = datetime.strptime(data['from_date'], '%Y-%m-%d')
         # to_date = datetime.strptime(data['to_date'], '%Y-%m-%d')
-        serializer = ToolUpdateSerializer(Tool.objects.filter(category=category, to_date__lt=from_date, city=location), many=True)
+        serializer = ToolUpdateSerializer(Tool.objects.filter(category=category, to_date__lte=from_date, city=location), many=True)
         return Response(serializer.data)
