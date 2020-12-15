@@ -353,3 +353,5 @@ def rating(request,id):
         return redirect(show_payment)
     else:
         return render(request, 'tools/rating.html')
+
+

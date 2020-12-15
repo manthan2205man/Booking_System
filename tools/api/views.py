@@ -1,5 +1,8 @@
 import jwt, json, random, string
-
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect, render
+from tools.paytm import Checksum
 from datetime import datetime, timedelta, date
 
 from accounts.api.authentication import TokenAuthentication
@@ -93,3 +96,77 @@ class ToolFilterView(APIView):
         serializer = ToolUpdateSerializer(Tool.objects.filter(category=category, to_date__lte=from_date, city=location), many=True)
         return Response(serializer.data)
 
+MERCHANT_KEY='tbQubBXKkCa5IloY'
+
+@api_view()
+def order(request,id):
+    obj = Booking.objects.get(id=id)
+    print(obj)
+    user_name =  obj.tools.owner.first_name
+    cus_name = request.user.first_name
+    user_upper = user_name.upper()
+    cus_upper = cus_name.upper()
+    print(user_upper[0] + cus_upper)
+    N = 7
+    res = ''.join(random.choices(string.ascii_uppercase +
+                                 string.digits, k=N))
+    orderid = user_upper[0] + cus_upper + str(res)
+
+    s1 = orderid
+    s2 = obj.amount
+
+    Payment.objects.create(order=obj,amount=obj.amount,payment_id=orderid)
+
+    param_dict = {
+        'MID': 'soObkr88054489271706',
+        'ORDER_ID': str(s1),
+        'TXN_AMOUNT': str(s2),
+        'CUST_ID': '5',
+        'INDUSTRY_TYPE_ID': 'Retail',
+        'WEBSITE': 'WEBSTAGING',  # for testing
+        'CHANNEL_ID': 'WEB',
+        'CALLBACK_URL': 'http://127.0.0.1:8000/tools/handlerequest/',
+    }
+    param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
+    return Response({'param_dict': param_dict})
+
+@api_view(http_method_names=['post'])
+# @csrf_exempt
+def handlerequest(request):  # paytm will send POST request herre
+    # paytm will send you post request here
+    form = request.POST
+    response_dict = {}
+    for i in form.keys():
+        response_dict[i] = form[i]
+        if i == 'CHECKSUMHASH':
+            checksum = form[i]
+
+    verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
+    if verify:
+        if response_dict['RESPCODE'] == '01':
+            print('order successful')
+            a = response_dict['ORDERID']
+            b = response_dict['TXNID']
+            c = response_dict['BANKTXNID']
+            d = response_dict['TXNDATE']
+
+            obj = Payment.objects.get(payment_id=a)
+            print(obj)
+            
+
+            obj.status ='success'
+            obj.txn_id = b
+            obj.bank_txn_id = c
+            obj.txn_date = d
+            obj.save()
+
+            map = Tool.objects.get(id=obj.order.tools.id)
+            map.to_date = obj.order.to_date+timedelta(days=1)
+            map.save()
+
+            book = Booking.objects.get(id=obj.order.id)
+            book.pay_status = 'success'
+            book.save()
+        else:
+            print('order was not successful because' + response_dict['RESPMSG'])
+    return Response({'response': response_dict})

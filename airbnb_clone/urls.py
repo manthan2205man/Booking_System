@@ -25,6 +25,7 @@ urlpatterns = [
     path('tools/', include('tools.urls')),
     path('accounts/api/', include('accounts.api.urls')),
     path('tools/api/', include('tools.api.urls')),
+    path('api/paytm/', include('drf_paytm.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

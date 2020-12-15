@@ -49,7 +49,10 @@ INSTALLED_APPS = [
     'accounts',
     'tools',
     'crispy_forms',
-    'rest_framework'
+    'rest_framework',
+    'drf_paytm',
+    'drfaddons',
+
 ]
 
 MIDDLEWARE = [
@@ -177,3 +180,11 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'accounts.api.authentication.TokenAuthentication',
+        
+    ]
+}
