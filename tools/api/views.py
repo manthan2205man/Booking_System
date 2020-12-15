@@ -93,4 +93,3 @@ class ToolFilterView(APIView):
         serializer = ToolUpdateSerializer(Tool.objects.filter(category=category, to_date__lte=from_date, city=location), many=True)
         return Response(serializer.data)
 
-# abcd
