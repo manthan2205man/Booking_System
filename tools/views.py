@@ -266,12 +266,26 @@ def handlerequest(request):  # paytm will send POST request herre
 
         else:
             print('order was not successful because' + response_dict['RESPMSG'])
-    return render(request, 'payment/paymentstatus.html', {'response': response_dict})
+    return redirect('show_payment') 
 
 @login_required(login_url='/accounts/login/')
 def show_my_booking(request):
     data= Booking.objects.filter(customer=request.user)
     return render(request, 'tools/show_my_booking.html',{'data':data})
+
+@login_required(login_url='/accounts/login/')
+def complete_payment(request, id):
+    try:
+        booking = Booking.objects.get(id=id)
+        if booking.from_date >= booking.tools.to_date:
+            return render(request, 'tools/booknow.html',{'book':booking})
+        else:
+            messages.error(request, "Tool is not available on selected dates.")
+            return redirect('show_my_booking')
+    except:
+        messages.error(request, "Booking Not Found.")
+        return redirect('show_my_booking')
+
 
 @login_required(login_url='/accounts/login/')
 def show_payment(request):

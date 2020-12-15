@@ -9,6 +9,6 @@ urlpatterns = [
     path('update_tool/<str:pk>/', views.ToolUpdateView.as_view(), name='update_tool'),
     path('list_tool/', views.ToolListView.as_view(), name='list_tool'),
     path('filter_tool/', views.ToolFilterView.as_view(), name='filter_tool'),
-    path('order/<int:id>/', views.order, name='order'),
-    path('handlerequest/', views.handlerequest, name='handlerequest'),
+    path('order/<int:id>/', views.order, name='api_order'),
+    path('handlerequest/', views.handlerequest, name='api_handlerequest'),
 ]

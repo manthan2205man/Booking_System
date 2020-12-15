@@ -45,6 +45,9 @@
       <td>{{i.amount}}</td>
       <td>{{i.booked_days}}</td>
       <td>{{i.pay_status}}</td>
+      {% if i.pay_status == 'pending' %}
+       <td><a href="{% url 'complete_payment' id=i.pk %}" class="btn btn-primary">Complete Payment</a></td>
+      {% endif %}
 
     </tr>
   {% endfor %}

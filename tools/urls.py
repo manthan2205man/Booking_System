@@ -18,6 +18,7 @@ urlpatterns = [
     path('order/<int:id>/', views.order, name='order'),
     path('handlerequest/', views.handlerequest, name='handlerequest'),
     path('show_my_booking/', views.show_my_booking, name='show_my_booking'),
+    path('complete_payment/<int:id>', views.complete_payment, name='complete_payment'),
     path('show_payment/', views.show_payment, name='show_payment'),
     path('owner_payment/', views.owner_payment, name='owner_payment'),
     path('rating/<int:id>', views.rating, name='rating'),
