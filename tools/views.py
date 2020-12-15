@@ -217,12 +217,13 @@ def order(request,id):
 def handlerequest(request):  # paytm will send POST request herre
     # paytm will send you post request here
     form = request.POST
+    print(form)
     response_dict = {}
     for i in form.keys():
         response_dict[i] = form[i]
         if i == 'CHECKSUMHASH':
             checksum = form[i]
-
+    print(response_dict)
     verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
     if verify:
         if response_dict['RESPCODE'] == '01':
@@ -263,7 +264,6 @@ def handlerequest(request):  # paytm will send POST request herre
             send_mail('Booking Confirmation', message, settings.EMAIL_HOST_USER, [book.customer],
                               fail_silently=True)
 
-
         else:
             print('order was not successful because' + response_dict['RESPMSG'])
     return redirect('show_payment') 
@@ -294,7 +294,7 @@ def show_payment(request):
 
 @login_required(login_url='/accounts/login/')
 def owner_payment(request):
-    data= Payment.objects.filter(order__tools__owner=request.user,status='successful')
+    data= Payment.objects.filter(order__tools__owner=request.user,status='success')
     print(data)
     return render(request, 'tools/owner_payment.html',{'data':data})
 
