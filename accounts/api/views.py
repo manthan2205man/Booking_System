@@ -24,10 +24,21 @@ class UserCreatView(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         serializer = UserCreationSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             serializer.save()
-            return Response(data={"Owner User Created":serializer.data}, status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                data={
+                    "Status":HTTP_200_OK,
+                    "Message":"User Created Successfully",
+                    "Result":serializer.data}, 
+                status=HTTP_200_OK
+            )
+        return Response(
+            data={
+                "Status":HTTP_400_BAD_REQUEST,
+                "Result":serializer.errors}, 
+            status=HTTP_400_BAD_REQUEST
+        )
 
 
 class LoginView(APIView):
@@ -35,13 +46,23 @@ class LoginView(APIView):
 
     def post(self, request, *args,**kwargs):
         if not request.data['email'] or not request.data['password']:
-            return Response({"Error":"Email and Password is must to login."}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                data={
+                    "Status":HTTP_400_BAD_REQUEST,
+                    "Message":"Email and Password is must to login."},
+                status=HTTP_400_BAD_REQUEST
+            )
         email = request.data['email']
         password = request.data['password']
 
         user = authenticate(username=email, password=password)
         if user is None:
-            return Response({"Error":"Email or Password is Incorrect."}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                data={
+                    "Status":HTTP_400_BAD_REQUEST,
+                    "Message":"Email or Password is Incorrect."},
+                status=HTTP_400_BAD_REQUEST
+            )
 
         payload = {
             "username":user.username,
@@ -61,7 +82,14 @@ class LoginView(APIView):
             expire_time = datetime.today() + timedelta(hours=24)
             d_token = Token.objects.create(user=user, token=jwt_token, expire=expire_time)
 
-        return Response({"token":jwt_token}, status=HTTP_200_OK)
+        return Response(
+            data={
+                "Status":HTTP_200_OK,
+                "Message":"Login Successfully.",
+                "Result":{"Token":jwt_token}
+            }, 
+            status=HTTP_200_OK
+        )
 
 class test(APIView):
     # authentication_classes = [TokenAuthentication,]

@@ -14,6 +14,7 @@ class ToolCreationSerializer(ModelSerializer):
         fields = [
             'owner', 'title', 'category', 'latitude', 'longitude', 'to_date', 'description', 'photo', 'price', 'address', 'city',
         ]
+        
 
 class BookingCreationSerializer(ModelSerializer):
     class Meta:

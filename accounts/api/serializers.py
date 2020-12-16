@@ -14,8 +14,11 @@ class UserCreationSerializer(ModelSerializer):
         ]
         extra_kwargs = {'password':{'write_only':True}}
 
+    
+
     def validate_email(self, value):
-        email = value
+        if value == "":
+            raise ValidationError("Email is Required to create account.")
         try:
             user = User.objects.get(username=email)
         except:
@@ -30,6 +33,26 @@ class UserCreationSerializer(ModelSerializer):
         password = data.get('password')
         if password != password2:
             raise ValidationError("Password and Confirm Password didn't match.")
+        return value
+
+    def validate_first_name(self, value):
+        if value == "":
+            raise ValidationError("This field may not be blank.")
+        return value
+
+    def validate_last_name(self, value):
+        if value == "":
+            raise ValidationError("This field may not be blank.")
+        return value
+
+    def validate_phone(self, value):
+        if value == None:
+            raise ValidationError("This field may not be blank.")
+        return value
+
+    def validate_city(self, value):
+        if value == None:
+            raise ValidationError("This field may not be blank.")
         return value
 
     def create(self, validated_data):

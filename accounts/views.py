@@ -19,11 +19,15 @@ def home(request):
             if not selected_todate == None and not selected_fromdate == None:
                 if not seleted_category == "none":
                     loc = Location.objects.get(id=selected_location)
-                    data = Tool.objects.exclude(owner=request.user).filter(category=seleted_category,to_date__lte=selected_fromdate)
+                    try:
+                        data = Tool.objects.exclude(owner=request.user).filter(category=seleted_category)
+                    except:
+                        data = Tool.objects.filter(category=seleted_category)
                     return render(request, 'index.html',{'loc': loc,'data': data,'data1': data1,'cat_data':cat_data})
-
-    data = Tool.objects.exclude(owner=request.user)
-    # data = Tool.objects.all()
+    try:
+        data = Tool.objects.exclude(owner=request.user)
+    except:
+        data = Tool.objects.all()
     return render(request,'index.html',{'data': data,'data1': data1,'cat_data':cat_data})
 
 def register(request):

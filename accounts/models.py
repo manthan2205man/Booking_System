@@ -13,7 +13,7 @@ class User(AbstractUser):
 
     # is_owner = models.BooleanField(default=False)
     # is_customer = models.BooleanField(default=False)
-    phone = models.BigIntegerField(default=0,validators=[RegexValidator(regex='\d{10}',message='invalid number',code='invalid_number')])
+    phone = models.BigIntegerField(null=True,validators=[RegexValidator(regex=r'\d{10}',message='Please Enter valid 10-digit Number.',code='invalid_number')])
     city = models.CharField(max_length=20,null=True)
 
     def __str__(self):

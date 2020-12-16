@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
-
 import environ
 
 env = environ.Env()
@@ -98,22 +97,23 @@ WSGI_APPLICATION = 'airbnb_clone.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': env("DATABASE_ENGINE"),
         'NAME': env("DATABASE_NAME"),
         'USER': env("DATABASE_USER"),
         'PASSWORD':env("DATABASE_PASSWORD"),
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT")
     }
 }
+
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'airbnb_clone',
-#         'USER': 'root',
+#         'ENGINE': '',
+#         'NAME': '',
+#         'USER': '',
 #         'PASSWORD':'',
-#         'HOST': '127.0.0.1',
-#         'PORT': '3306'
+#         'HOST': '',
+#         'PORT': ''
 #     }
 # }
 
@@ -153,7 +153,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+
 AUTH_USER_MODEL='accounts.User'
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
@@ -175,11 +177,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+PAYTM_MERCHANT_KEY = env("PAYTM_MERCHANT_KEY")
+PAYTM_MERCHANT_ID = env("PAYTM_MERCHANT_ID")
 
 
 # REST_FRAMEWORK = {
