@@ -78,10 +78,10 @@ class Payment(models.Model):
     order_date = models.DateField(null=True, auto_now_add=True)
     status = models.CharField(max_length=20, null=True, default='pending', choices=status)
     amount = models.IntegerField(null=True)
-    txn_id = models.CharField(max_length=50, null=True)
-    bank_txn_id = models.IntegerField(null=True)
-    txn_date = models.CharField(max_length=20, null=True)
-    payment_id = models.CharField(max_length=20, null=True)
+    txn_id = models.CharField(max_length=100, null=True)
+    bank_txn_id = models.CharField(max_length=100,null=True)
+    txn_date = models.CharField(max_length=100, null=True)
+    payment_id = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return str(self.id)+"-----"+str(self.order_id)

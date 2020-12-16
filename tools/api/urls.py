@@ -11,4 +11,5 @@ urlpatterns = [
     path('filter_tool/', views.ToolFilterView.as_view()),
     path('order/<int:pk>/', views.order),
     path('handlerequest/', views.handlerequest),
+    path('rating/<int:id>/', views.rating),
 ]

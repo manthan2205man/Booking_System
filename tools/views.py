@@ -218,9 +218,9 @@ def handlerequest(request):  # paytm will send POST request herre
         if response_dict['RESPCODE'] == '01':
             obj = Payment.objects.get(payment_id=response_dict['ORDERID'])
             obj.status = 'success'
-            obj.txn_id = response_dict['TXNID']
-            obj.bank_txn_id = response_dict['BANKTXNID']
-            obj.txn_date = response_dict['TXNDATE']
+            obj.txn_id = str(response_dict['TXNID'])
+            obj.bank_txn_id = str(response_dict['BANKTXNID'])
+            obj.txn_date = str(response_dict['TXNDATE'])
             obj.save()
 
             tool = Tool.objects.get(id=obj.order.tools.id)

@@ -12,7 +12,7 @@ from accounts.api.permissions import  BookingOwnerOnly, ToolOwnerOnly
 from tools.models import Tool, Booking, Location, Payment, Save_Tools, Rating
 from tools.api.serializers import ToolCreationSerializer, BookingCreationSerializer, BookingUpdateSerializer, ToolUpdateSerializer
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, RetrieveDestroyAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
@@ -65,6 +65,7 @@ class BookingCreatView(CreateAPIView):
         data, user = request.data, request.user
         for i in data:
             if data.get(i) == "":
+                print(data)
                 return Response(
                     data={"Status":HTTP_400_BAD_REQUEST, "Message":f"{str(i).title()} field may not be blank."}, 
                     status=HTTP_400_BAD_REQUEST
@@ -172,8 +173,7 @@ class ToolListView(APIView):
 
     def get(self, request, *args, **kwargs):        
         try:
-            tools = ToolUpdateSerializer(Tool.objects.all())
-            print("AAAAAAA", tools.data)
+            tools = ToolUpdateSerializer(Tool.objects.all(), many=True)
             return Response(
                 data={"Status":HTTP_200_OK,
                 "Result":tools.data},
@@ -185,6 +185,7 @@ class ToolListView(APIView):
                 "Message":"No Tools Found."},
                 status=HTTP_400_BAD_REQUEST
             )
+
 class ToolFilterView(APIView):
     permission_classes = [AllowAny,]
     serializer_class = ToolUpdateSerializer
@@ -195,18 +196,34 @@ class ToolFilterView(APIView):
         location = data['location']
         from_date = datetime.strptime(data['from_date'], '%Y-%m-%d')
         # to_date = datetime.strptime(data['to_date'], '%Y-%m-%d')
-        serializer = ToolUpdateSerializer(Tool.objects.filter(category=category, city=location), many=True)
-        return Response(serializer.data)
+        serializer = ToolUpdateSerializer(Tool.objects.filter(category=category,to_date__lte=from_date ,city=location), many=True)
+        if serializer.data:
+            return Response(
+                data={"Status":HTTP_200_OK,
+                "Message":"Available Tools on Selected dates.",
+                "Result":serializer.data},
+                status=HTTP_200_OK
+            )
+        return Response(
+            data={"Status":HTTP_400_BAD_REQUEST,
+            "Message":"No Tools Available.",
+            "Result":[]},
+            status=HTTP_400_BAD_REQUEST
+        )
 
 MERCHANT_KEY=str(settings.PAYTM_MERCHANT_KEY)
 
 @api_view()
+@authentication_classes([TokenAuthentication])
 def order(request, pk):
     try:
-        obj = Booking.objects.get(id=pk)
+        obj = Booking.objects.get(id=pk, customer=request.user)
     except:
-        messages.error(request, "Booking Not Found")
-        return redirect('home')
+        return Response(
+            data={"Status":HTTP_400_BAD_REQUEST,
+            "Message":"Booking Not Found."},
+            status=HTTP_400_BAD_REQUEST
+        )
     user_name = str(obj.tools.owner.first_name).upper()
     cus_name = str(request.user.first_name).upper()
     orderid = user_name[0] + cus_name + str(''.join(random.choices(string.ascii_uppercase + string.digits, k=7)))
@@ -224,7 +241,11 @@ def order(request, pk):
         'CALLBACK_URL': 'http://127.0.0.1:8000/tools/api/handlerequest/',
     }
     param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
-    return Response({'param_dict': param_dict})
+    return Response(
+        data={"Status":HTTP_200_OK,"Result":{'param_dict': param_dict}},
+        status=HTTP_200_OK
+    )
+
 
 #    ''' To render on our template, like web page on application. '''
     # return render(request, 'payment/paytm.html', {'param_dict': param_dict})
@@ -272,4 +293,54 @@ def handlerequest(request):  # paytm will send POST request herre
 
         else:
             print('order was not successful because' + response_dict['RESPMSG'])
-    return Response({'response': response_dict})
+            return Response(
+                data={"Status":HTTP_400_BAD_REQUEST,
+                "Message":f"Order was not successful because' {response_dict['RESPMSG']}"},
+                status=HTTP_400_BAD_REQUEST
+            )
+            
+    return Response(
+        data={"Status":HTTP_200_OK,
+        "Message":"Payment Successfull.",
+        'Result':response_dict},
+        status=HTTP_200_OK
+    )
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+def rating(request, id):
+    selected_rating = request.POST.get('star')
+    selected_review = request.POST.get('review')
+    try:
+        obj = Payment.objects.get(id=id, order__customer=request.user, status='success')
+    except:
+        return Response(
+            data={"Status":HTTP_400_BAD_REQUEST,
+            "Message":"Confirmed Order not found, kindly complete payment."},
+            status=HTTP_400_BAD_REQUEST
+        )
+    if Rating.objects.filter(customer=request.user, payment=obj):
+        return Response(
+            data={"Status":HTTP_400_BAD_REQUEST,
+            "Message":"Rating Already Submitted."},
+            status=HTTP_400_BAD_REQUEST
+        )
+    Rating.objects.create(customer=request.user, payment=obj, rating=selected_rating, review=selected_review)
+
+    ratings = Rating.objects.filter(payment__order__tools=obj.order.tools)
+    average = None
+    if ratings:
+        l = []
+        for i in ratings:
+            l.append(i.rating)
+        average = sum(l) / len(l)
+        tools = Tool.objects.get(id=obj.order.tools.id)
+        tools.rating = average
+        tools.save()
+    return Response(
+        data={"Status":HTTP_200_OK,
+        "Message":"Rating Submitted Successfully.",
+        "Result":{"Rating":selected_rating,"Review":selected_review}
+        },
+        status=HTTP_200_OK
+    )

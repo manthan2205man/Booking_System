@@ -16,23 +16,23 @@ class TokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         auth = get_authorization_header(request).split()
         if not auth or auth[0].lower() != b'token':
-            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":"Invalid Method of token passing."}
+            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":["Invalid Method of token passing.", 'Authentication credentials were not provided.']}
             raise exceptions.AuthenticationFailed(msg)
 
         if len(auth) == 1:
-            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":'Invalid token header. No credentials provided.'}
+            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":['Invalid token header. No credentials provided.', 'Authentication credentials were not provided.']}
             raise exceptions.AuthenticationFailed(msg)
         elif len(auth) > 2:
-            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":'Invalid token header'}
+            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":['Invalid token header', 'Authentication credentials were not provided.']}
             raise exceptions.AuthenticationFailed(msg)
 
         try:
             token = auth[1]
             if token=="null":
-                msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":'Null token not allowed'}
+                msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":['Null token not allowed', 'Authentication credentials were not provided.']}
                 raise exceptions.AuthenticationFailed(msg)
         except UnicodeError:
-            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":'Invalid token header. Token string should not contain invalid characters.'}
+            msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":['Invalid token header. Token string should not contain invalid characters.', 'Authentication credentials were not provided.']}
             raise exceptions.AuthenticationFailed(msg)
         
         return self.authenticate_credentials(token)
@@ -48,17 +48,17 @@ class TokenAuthentication(BaseAuthentication):
             a_token = d_token.token
 
             if str(a_token) != str(token):
-                msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":"Token mismatch or Expired"}
+                msg = {"Status":HTTP_401_UNAUTHORIZED, "Message":["Token mismatch or Expired", 'Authentication credentials were not provided.']}
                 raise exceptions.AuthenticationFailed(msg)
                
         except jwt.ExpiredSignature or jwt.DecodeError or jwt.InvalidTokenError:
             return HttpResponse(
-                {"Status":HTTP_403_FORBIDDEN,'Message': "Token is invalid"},
+                {"Status":HTTP_403_FORBIDDEN,'Message': ["Token is invalid", 'Authentication credentials were not provided.']},
                 status="403"
             )
         except User.DoesNotExist:
             return HttpResponse(
-                {"Status":HTTP_500_INTERNAL_SERVER_ERROR,'Message': "Internal server error"},
+                {"Status":HTTP_500_INTERNAL_SERVER_ERROR,'Message': ["Internal server error", 'Authentication credentials were not provided.']},
                 status="500"
             )
 

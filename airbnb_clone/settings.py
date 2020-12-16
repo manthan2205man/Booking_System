@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     'tools',
     'crispy_forms',
     'rest_framework',
-    'drf_paytm',
-    'drfaddons',
+    # 'drf_paytm',
+    # 'drfaddons',
 
 ]
 
